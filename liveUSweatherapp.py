@@ -82,47 +82,6 @@ class WeatherMap:
         }
         return icons.get(condition, '❓')
 
-    def fetch_weather_data(self):
-        """Fetch real weather data from OpenWeatherMap API"""
-        weather_data = []
-        
-        for city, coords in self.cities.items():
-            params = {
-                "lat": coords["lat"],
-                "lon": coords["lon"],
-                "appid": self.api_key,
-                "units": "imperial"
-            }
-            
-            try:
-                response = requests.get(self.base_url, params=params)
-                response.raise_for_status()
-                data = response.json()
-                
-                weather_info = {
-                    "city": city,
-                    "lat": coords["lat"],
-                    "lon": coords["lon"],
-                    "temperature": round(data["main"]["temp"], 1),
-                    "condition": data["weather"][0]["main"],
-                    "humidity": data["main"]["humidity"],
-                    "wind_speed": data["wind"]["speed"],
-                    "feels_like": round(data["main"]["feels_like"], 1),
-                    "condition_icon": self.get_condition_icon(data["weather"][0]["main"]),
-                    "condition_color": self.condition_colors.get(data["weather"][0]["main"], '#808080')
-                }
-                
-                weather_data.append(weather_info)
-                print(f"Successfully fetched data for {city}")
-                
-                time.sleep(1)
-                
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching data for {city}: {e}")
-                continue
-            
-        return pd.DataFrame(weather_data)
-
     def create_map(self, data):
         """Create an interactive map visualization with improved text layout"""
         fig = go.Figure()
